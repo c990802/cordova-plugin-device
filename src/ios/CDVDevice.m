@@ -50,7 +50,7 @@
 {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     static NSString* UUID_KEY = @"CDVUUID";
-    
+
     // Check user defaults first to maintain backwards compaitibility with previous versions
     // which didn't user identifierForVendor
     NSString* app_uuid = [userDefaults stringForKey:UUID_KEY];
@@ -59,16 +59,18 @@
         [userDefaults setObject:app_uuid forKey:UUID_KEY];
         [userDefaults synchronize];
     }
-    
+
     return app_uuid;
 }
 
 - (void)getDeviceInfo:(CDVInvokedUrlCommand*)command
 {
-    NSDictionary* deviceProperties = [self deviceProperties];
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:deviceProperties];
+    [self.commandDelegate runInBackground:^{
+        NSDictionary* deviceProperties = [self deviceProperties];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:deviceProperties];
 
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
 }
 
 - (NSDictionary*)deviceProperties
